@@ -15,7 +15,11 @@ struct Graph {
 
 impl Graph {
     fn new(n_nodes: i32) -> Graph {
-        Graph{edges: HashMap::new(), start: -1, n_nodes: n_nodes}
+        Graph {
+            edges: HashMap::new(),
+            start: -1,
+            n_nodes: n_nodes,
+        }
     }
 
     fn get_nodes(&self) -> Vec<&i32> {
@@ -36,11 +40,12 @@ fn read_graphs() -> Vec<Graph> {
     let stdin = io::stdin();
     let lines = stdin.lock().lines().map(|x| x.expect("Input not readable"));
     let mut graphs = Vec::new();
-    let mut content = lines
-        .map(|line| line.split(' ').filter(|n| !n.is_empty())
-             .map(|n| n.parse::<i32>().unwrap())
-             .collect::<Vec<_>>()
-    );
+    let mut content = lines.map(|line| {
+        line.split(' ')
+            .filter(|n| !n.is_empty())
+            .map(|n| n.parse::<i32>().unwrap())
+            .collect::<Vec<_>>()
+    });
     let n_graphs = content.next().unwrap()[0];
     for _ in 0..n_graphs {
         let line = content.next().unwrap();
@@ -49,8 +54,8 @@ fn read_graphs() -> Vec<Graph> {
         for _ in 0..line[1] {
             let line = content.next().unwrap();
             let min = match min_weight.get(&(line[0], line[1])) {
-                    Some(&n) => min(n, line[2]),
-                    None => line[2],
+                Some(&n) => min(n, line[2]),
+                None => line[2],
             };
             min_weight.insert((line[0], line[1]), min);
         }
@@ -96,7 +101,7 @@ fn dijkstra(graph: &Graph) -> HashMap<i32, i32> {
     while !q.is_empty() {
         let mut node = -1;
         while !q.contains(&node) {
-            if let Some(HeapNode(n, _)) = heap.pop(){
+            if let Some(HeapNode(n, _)) = heap.pop() {
                 node = n;
             }
         }
@@ -113,14 +118,11 @@ fn dijkstra(graph: &Graph) -> HashMap<i32, i32> {
             }
         }
     }
-
-    dist.clone()
+    dist
 }
 
 fn main() {
-    let graphs = read_graphs();
-
-    for graph in &graphs {
+    for graph in &read_graphs() {
         let dist = dijkstra(graph);
         for n in (1..(graph.n_nodes + 1)).filter(|&x| x != graph.start) {
             let &d = dist.get(&n).unwrap_or(&std::i32::MAX);

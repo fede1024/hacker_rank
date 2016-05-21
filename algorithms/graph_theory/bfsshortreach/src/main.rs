@@ -11,7 +11,11 @@ struct Graph {
 
 impl Graph {
     fn new(n_nodes: i32) -> Graph {
-        Graph{edges: HashMap::new(), start: -1, n_nodes: n_nodes}
+        Graph {
+            edges: HashMap::new(),
+            start: -1,
+            n_nodes: n_nodes,
+        }
     }
 
     fn add_edge(&mut self, node: i32, neighbor: i32) {
@@ -28,11 +32,12 @@ fn read_graphs() -> Vec<Graph> {
     let stdin = io::stdin();
     let lines = stdin.lock().lines().map(|x| x.expect("Input not readable"));
     let mut graphs = Vec::new();
-    let mut content = lines
-        .map(|line| line.split(' ').filter(|n| !n.is_empty())
-             .map(|n| n.parse::<i32>().unwrap())
-             .collect::<Vec<_>>()
-    );
+    let mut content = lines.map(|line| {
+        line.split(' ')
+            .filter(|n| !n.is_empty())
+            .map(|n| n.parse::<i32>().unwrap())
+            .collect::<Vec<_>>()
+    });
     let n_graphs = content.next().unwrap()[0];
     for _ in 0..n_graphs {
         let line = content.next().unwrap();
@@ -86,7 +91,7 @@ fn main() {
         for n in (1..(graph.n_nodes + 1)).filter(|&x| x != graph.start) {
             let d = match dist.get(&n) {
                 Some(x) => x * 6,
-                None    => -1,
+                None => -1,
             };
             print!("{} ", d);
         }

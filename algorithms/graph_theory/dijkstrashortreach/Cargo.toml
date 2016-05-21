@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Federico Giraud <giraud.federico@gmail.com>"]
 
 [dependencies]
-clippy='0.0.63'
+clippy="0.0.63"
