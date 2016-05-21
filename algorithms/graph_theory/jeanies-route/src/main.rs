@@ -1,8 +1,11 @@
-use std::io;
-use std::io::prelude::*;
+use std::cell::Cell;
+use std::cmp::Ord;
+use std::cmp::Ordering;
+use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::cell::Cell;
+use std::io::prelude::*;
+use std::io;
 
 struct Graph {
     edges: HashMap<i32, Vec<(i32, i32)>>,
@@ -41,24 +44,40 @@ fn read_input() -> (Graph, Vec<i32>) {
     (graph, content[1].clone())
 }
 
+#[derive(PartialEq, Eq)]
+struct HeapNode(i32, i32);
+
+impl Ord for HeapNode {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.1.cmp(&other.1).reverse()
+    }
+}
+
+impl PartialOrd for HeapNode {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 fn dijkstra(graph: &Graph, source: i32) -> HashMap<i32, i32> {
     let mut q = HashSet::new();
     let mut dist = HashMap::new();
+    let mut heap = BinaryHeap::new();
 
     for &node in graph.get_nodes() {
         dist.insert(node, std::i32::MAX);
+        heap.push(HeapNode(node, std::i32::MAX));
         q.insert(node);
     }
 
     dist.insert(source, 0);
+    heap.push(HeapNode(source, 0));
 
     while !q.is_empty() {
         let mut node = -1;
-        let mut node_dist = std::i32::MAX;
-        for &n in &q {
-            if dist[&n] < node_dist {
+        while !q.contains(&node) {
+            if let Some(HeapNode(n, _)) = heap.pop(){
                 node = n;
-                node_dist = dist[&n];
             }
         }
         q.remove(&node);
@@ -67,12 +86,14 @@ fn dijkstra(graph: &Graph, source: i32) -> HashMap<i32, i32> {
             let updated_dist = dist[&node] + distance;
             if updated_dist < dist[&neighbor] {
                 dist.insert(neighbor, updated_dist);
+                heap.push(HeapNode(neighbor, updated_dist));
             }
         }
     }
 
     dist.clone()
 }
+
 
 fn search(distances: &HashMap<i32, HashMap<i32, i32>>, letters: &Vec<i32>, curr_node: i32, curr_dist: i32, best: &Cell<i32>) {
     if letters.is_empty() {
