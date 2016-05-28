@@ -59,7 +59,7 @@ impl PartialOrd for HeapNode {
     }
 }
 
-fn dijkstra(graph: &Graph, source: i32) -> HashMap<i32, i32> {
+fn dijkstra(graph: &Graph, source: i32, dest: &HashSet<i32>) -> Option<(i32, i32)> {
     let mut q = HashSet::new();
     let mut dist = HashMap::new();
     let mut heap = BinaryHeap::new();
@@ -80,6 +80,9 @@ fn dijkstra(graph: &Graph, source: i32) -> HashMap<i32, i32> {
                 node = n;
             }
         }
+        if dest.contains(&node) {
+            return Some((node, dist[&node]));
+        }
         q.remove(&node);
 
         for &(neighbor, distance) in graph.get_edges(node) {
@@ -91,7 +94,7 @@ fn dijkstra(graph: &Graph, source: i32) -> HashMap<i32, i32> {
         }
     }
 
-    dist.clone()
+    None
 }
 
 
@@ -117,18 +120,36 @@ fn search(distances: &HashMap<i32, HashMap<i32, i32>>, letters: &Vec<i32>, curr_
 
 fn main() {
     let (graph, letters) = read_input();
-    let mut distances = HashMap::new();
+    // let mut distances = HashMap::new();
+    let mut letters_set = HashSet::new();
 
     for &l in &letters {
-        distances.insert(l, dijkstra(&graph, l));
+        letters_set.insert(l);
     }
 
-    let best = Cell::new(std::i32::MAX);
-    for i in 0..letters.len() {
-        let mut others = Vec::new();
-        others.extend_from_slice(&letters[0..i]);
-        others.extend_from_slice(&letters[i+1..]);
-        search(&distances, &others, letters[i], 0, &best);
+    for &l in &letters {
+        let mut new_set = letters_set.clone();
+        let mut dist = 0;
+        let mut curr = l;
+        while new_set.len() > 1 {
+            new_set.remove(&curr);
+            let res = dijkstra(&graph, curr, &new_set).unwrap();
+            curr = res.0;
+            dist += res.1;
+        }
+        println!(">> {}", dist);
     }
-    println!("{}", best.get());
+
+    // for &l in &letters {
+    //     distances.insert(l, dijkstra(&graph, l));
+    // }
+
+    // let best = Cell::new(std::i32::MAX);
+    // for i in 0..letters.len() {
+    //     let mut others = Vec::new();
+    //     others.extend_from_slice(&letters[0..i]);
+    //     others.extend_from_slice(&letters[i+1..]);
+    //     search(&distances, &others, letters[i], 0, &best);
+    // }
+    // println!("{}", best.get());
 }
