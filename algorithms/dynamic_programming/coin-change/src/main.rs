@@ -27,7 +27,7 @@ fn calc(tot: i64, coins: &[i64], index: usize, cache: &mut HashMap<(i64, usize),
         return n;
     }
 
-    let sol = calc(tot - coins[index], coins, index, cache) + calc(tot, coins, index+1, cache);
+    let sol = calc(tot - coins[index], coins, index, cache) + calc(tot, coins, index + 1, cache);
     cache.insert((tot, index), sol);
     sol
 }
