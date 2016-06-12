@@ -63,22 +63,6 @@ impl Borders {
     }
 }
 
-fn combinations<T>(v: &[T]) -> Vec<Vec<&T>> {
-    if v.is_empty() {
-        return vec![vec![]];
-    }
-
-    let mut res = Vec::new();
-    for comb in combinations(&v[1..]) {
-        res.push(comb.clone());
-        let mut tmp = comb.clone();
-        tmp.push(&v[0]);
-        res.push(tmp);
-    }
-
-    res
-}
-
 fn take_n<T>(v: &[T], n: i32) -> Vec<Vec<&T>> {
     if v.is_empty() || n == 0 {
         return vec![vec![]];
@@ -92,21 +76,6 @@ fn take_n<T>(v: &[T], n: i32) -> Vec<Vec<&T>> {
         res.push(tmp);
     }
 
-    res
-}
-
-fn bin_coeff_(n: i64, k: i64) -> i64 {
-    if k < 0 || k > n {
-        return 0;
-    }
-    if k == 0 || k == n {
-        return 1;
-    }
-    let k = min(k, n - k);
-    let mut res = 1;
-    for i in 0..k {
-        res = res * (n - i) / (i + 1);
-    }
     res
 }
 
@@ -149,6 +118,7 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
+    // take_n is slow :(
     for comb in take_n(&rim, clean) {
         if comb.len() == 0 {
             continue;
