@@ -1,0 +1,6 @@
+[package]
+name = "two-strings"
+version = "0.1.0"
+authors = ["Federico Giraud <giraud.federico@gmail.com>"]
+
+[dependencies]
