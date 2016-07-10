@@ -1,0 +1,6 @@
+[package]
+name = "p-sequences"
+version = "0.1.0"
+authors = ["Federico Giraud <giraud.federico@gmail.com>"]
+
+[dependencies]
