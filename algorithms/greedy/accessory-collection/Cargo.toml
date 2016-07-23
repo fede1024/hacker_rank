@@ -1,0 +1,6 @@
+[package]
+name = "accessory-collection"
+version = "0.1.0"
+authors = ["Federico Giraud <fgiraud@yelp.com>"]
+
+[dependencies]
