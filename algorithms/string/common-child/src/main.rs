@@ -27,39 +27,70 @@ fn char_chain(s: &Vec<u8>, ref_char: u8) -> Chain {
     chain
 }
 
-fn find_common(a: &Vec<u8>, chains_b: &HashMap<u8, Chain>, pos_a: usize, pos_b: usize, len: usize) {
-    if pos_a >= a.len() {
-        return;
+struct Finder {
+    best: usize,
+    best_map: HashMap<(usize, usize), usize>,
+}
+
+impl Finder {
+    fn new() -> Finder {
+        Finder { best: 0, best_map: HashMap::new() }
     }
 
-    // for _ in (0..len) {
-    //     print!("  ");
-    // }
-    // println!("{} {}   {}", pos_a, pos_b, len);
+    fn find_common(&mut self, a: &Vec<u8>, chains_b: &HashMap<u8, Chain>, pos_a: usize, pos_b: usize, len: usize) {
+        if self.best < len {
+            self.best = len;
+        }
 
-    if let Some(next_b) = chains_b.get(&a[pos_a]).unwrap()[pos_b] {
+        if pos_a >= a.len() || pos_b >= a.len() {
+            return;
+        }
+
+        match self.best_map.get(&(pos_a, pos_b)) {
+            None => { self.best_map.insert((pos_a, pos_b), 0); },
+            Some(&n) => {
+                if len > n {
+                    self.best_map.insert((pos_a, pos_b), len);
+                } else {
+                    return;
+                }
+            },
+        };
+
+        // match self.best_map.entry((pos_a, pos_b)) {
+        //     Vacant(entry) => { entry.insert(len); },
+        //     Occupied(entry) => { entry.insert(max(entry, len)); },
+        // };
+
         // for _ in (0..len) {
         //     print!("  ");
         // }
-        // println!("found {} {}   {}", pos_a, pos_b, next_b);
-        find_common(a, chains_b, pos_a + 1, next_b + 1, len + 1);
-    }
+        // println!("{} {}   {}", pos_a, pos_b, len);
 
-    find_common(a, chains_b, pos_a + 1, pos_b, len);
+        if let Some(next_b) = chains_b.get(&a[pos_a]).unwrap()[pos_b] {
+            // for _ in (0..len) {
+            //     print!("  ");
+            // }
+            // println!("found {} {}   {}", pos_a, pos_b, next_b);
+            self.find_common(a, chains_b, pos_a + 1, next_b + 1, len + 1);
+        }
+
+        self.find_common(a, chains_b, pos_a + 1, pos_b, len);
+    }
 }
 
 fn main() {
     let (str_a, str_b) = read_input();
-    let chains: HashMap<u8, Chain> = HashMap::new();
 
     let chains = (65..91)
         .map(|c| (c, char_chain(&str_b, c)))
         .collect::<HashMap<_, _>>();
 
-    for (&c, chain) in &chains {
-        println!("{} {:?}", c as char, chain);
-    }
+    // for (&c, chain) in &chains {
+    //     println!("{} {:?}", c as char, chain);
+    // }
 
-    find_common(&str_a, &chains, 0, 0, 0);
-
+    let mut finder = Finder::new();
+    finder.find_common(&str_a, &chains, 0, 0, 0);
+    println!("{}", finder.best);
 }
